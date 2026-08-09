@@ -6,6 +6,59 @@
 (function () {
   "use strict";
 
+  /* ---------- ANALYTICS ---------- */
+  // GoatCounter loads async, so it usually isn't ready when this file runs --
+  // which would silently drop the cold-load hit from a shared ?game= link, the
+  // one most worth counting. Buffer until the script arrives and flush on load.
+  // If it never arrives (blocked, or the tag removed) the queue is just dropped
+  // and nothing breaks.
+  const trackQueue = [];
+
+  function goatReady() {
+    return !!(window.goatcounter && typeof window.goatcounter.count === "function");
+  }
+
+  function flushTrackQueue() {
+    if (!goatReady()) return;
+    while (trackQueue.length) window.goatcounter.count(trackQueue.shift());
+  }
+
+  function track(path, title, isEvent) {
+    const hit = { path: path, title: title, event: !!isEvent };
+    if (goatReady()) {
+      window.goatcounter.count(hit);
+      return;
+    }
+    // Cap it so a blocked script plus a click-happy visitor can't grow this
+    // without bound.
+    if (trackQueue.length < 20) trackQueue.push(hit);
+  }
+
+  // Async scripts finish before the load event, so this is the earliest point
+  // GoatCounter is reliably present.
+  window.addEventListener("load", flushTrackQueue);
+
+  // Clipboard with the pre-async fallback, for browsers (and file:// pages)
+  // where navigator.clipboard is missing or blocked.
+  function copyText(text, done) {
+    const legacyCopy = function () {
+      const ta = document.createElement("textarea");
+      ta.value = text;
+      ta.setAttribute("readonly", "");
+      ta.style.cssText = "position:fixed;top:0;left:-9999px;";
+      document.body.appendChild(ta);
+      ta.select();
+      try { document.execCommand("copy"); } catch (err) { /* nothing else to try */ }
+      document.body.removeChild(ta);
+      done();
+    };
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text).then(done).catch(legacyCopy);
+    } else {
+      legacyCopy();
+    }
+  }
+
   /* ---------- THEME ---------- */
   const root = document.documentElement;
   const themeBtn = document.getElementById("themeToggle");
@@ -181,67 +234,18 @@
     return thumb;
   }
 
+  // Play / Open / Preview all moved into the detail popup, so the card carries
+  // one button. Keeps the grid scannable and makes the detail view the single
+  // place a project is actually explored (and counted).
   function buildActions(game) {
     const wrap = document.createElement("div");
     wrap.className = "card-actions";
-
-    if (game.status === "live") {
-      if (game.embedUrl) {
-        const btn = document.createElement("button");
-        btn.type = "button";
-        btn.textContent = "Play here ▸";
-        btn.addEventListener("click", function () {
-          openEmbedModal(game);
-        });
-        wrap.appendChild(btn);
-      }
-      if (game.playUrl) {
-        const a = document.createElement("a");
-        a.href = game.playUrl;
-        a.target = "_blank";
-        a.rel = "noopener";
-        a.textContent = "Open ↗";
-        wrap.appendChild(a);
-      }
-      if (!game.embedUrl && !game.playUrl && game.youtubeId) {
-        const btn = document.createElement("button");
-        btn.type = "button";
-        btn.textContent = "Watch preview ▸";
-        btn.addEventListener("click", function () {
-          openVideoModal(game);
-        });
-        wrap.appendChild(btn);
-      }
-      if (!game.embedUrl && !game.playUrl && !game.youtubeId) {
-        const span = document.createElement("span");
-        span.className = "muted";
-        span.textContent = "Link coming soon";
-        wrap.appendChild(span);
-      }
-    } else {
-      if (game.youtubeId) {
-        const btn = document.createElement("button");
-        btn.type = "button";
-        btn.textContent = "Watch preview ▸";
-        btn.addEventListener("click", function () {
-          openVideoModal(game);
-        });
-        wrap.appendChild(btn);
-      } else if (game.images && game.images.length) {
-        const btn = document.createElement("button");
-        btn.type = "button";
-        btn.textContent = "View photos ▸";
-        btn.addEventListener("click", function () {
-          openGalleryModal(game);
-        });
-        wrap.appendChild(btn);
-      } else {
-        const span = document.createElement("span");
-        span.className = "muted";
-        span.textContent = "Preview coming soon";
-        wrap.appendChild(span);
-      }
-    }
+    const btn = document.createElement("button");
+    btn.type = "button";
+    btn.textContent = "View details ▸";
+    btn.setAttribute("aria-label", "View details for " + game.title);
+    btn.addEventListener("click", function () { openDetail(game); });
+    wrap.appendChild(btn);
     return wrap;
   }
 
@@ -456,6 +460,47 @@
     });
   })();
 
+  /* ---------- TICKER ---------- */
+  // The track scrolls by -50%, i.e. exactly one group, so the second group
+  // lands where the first started. That only reads as seamless while a single
+  // group is at least as wide as the viewport. The display font caps at
+  // 1.9rem, so past ~1170px the phrases stop growing while the window doesn't,
+  // and a fixed number of them would run out and leave dead space at the right
+  // edge. So measure instead: repeat the seed until it covers the viewport,
+  // mirror it, and derive the duration from the width to hold speed constant.
+  (function () {
+    const track = document.querySelector(".ticker-track");
+    if (!track) return;
+    const seed = track.innerHTML;
+    const SPEED = 80; // px per second, independent of how wide the group ends up
+
+    function build() {
+      track.innerHTML = seed;
+      const group = track.querySelector(".ticker-group");
+      if (!group) return;
+      const unit = group.innerHTML;
+      // Guard the loop: a zero-width unit (missing font, empty phrase) would
+      // otherwise spin forever.
+      let guard = 200;
+      while (group.offsetWidth < window.innerWidth && guard--) {
+        group.insertAdjacentHTML("beforeend", unit);
+      }
+      track.appendChild(group.cloneNode(true));
+      track.style.animationDuration = (group.offsetWidth / SPEED).toFixed(2) + "s";
+    }
+
+    build();
+    // The display font arrives after first paint and is far narrower than the
+    // fallback, so the first measurement is usually an overestimate.
+    if (document.fonts && document.fonts.ready) document.fonts.ready.then(build);
+
+    let resizeTimer;
+    window.addEventListener("resize", function () {
+      clearTimeout(resizeTimer);
+      resizeTimer = setTimeout(build, 150);
+    });
+  })();
+
   /* ---------- COURSES ---------- */
   const courseLog = document.getElementById("courseLog");
   COURSES.forEach(function (c) {
@@ -478,10 +523,13 @@
   const modalClose = document.getElementById("modalClose");
   let lastFocused = null;
 
+  const modalFullscreen = document.getElementById("modalFullscreen");
+
   function openModal(title, orientation) {
     lastFocused = document.activeElement;
     modalTitle.textContent = title;
     modalBody.className = "modal-body" + (orientation ? " orient-" + orientation : "");
+    modalFullscreen.hidden = true;
     overlay.classList.add("open");
     modalClose.focus();
     document.addEventListener("keydown", onModalKeydown);
@@ -489,9 +537,18 @@
   function closeModal() {
     overlay.classList.remove("open");
     modalBody.innerHTML = "";
+    modalFullscreen.hidden = true;
     document.removeEventListener("keydown", onModalKeydown);
-    if (lastFocused) lastFocused.focus();
+    if (lastFocused && document.contains(lastFocused)) lastFocused.focus();
   }
+
+  // The modal is capped at 88vh, which is still small for a real game. Offer
+  // the whole screen as an escape hatch for anything embedded.
+  modalFullscreen.addEventListener("click", function () {
+    const frame = modalBody.querySelector("iframe");
+    if (!frame || !frame.requestFullscreen) return;
+    frame.requestFullscreen().catch(function () { /* denied or unsupported */ });
+  });
   function onModalKeydown(e) {
     if (e.key === "Escape") closeModal();
   }
@@ -507,6 +564,7 @@
     iframe.setAttribute("allow", "fullscreen; gamepad");
     iframe.setAttribute("allowfullscreen", "");
     modalBody.appendChild(iframe);
+    modalFullscreen.hidden = !iframe.requestFullscreen;
   }
 
   function openVideoModal(game) {
@@ -520,6 +578,7 @@
 
   function openGalleryModal(game) {
     openModal(game.title + ": photos", null);
+    modalBody.classList.add("is-scroll");
     const gallery = document.createElement("div");
     gallery.className = "modal-gallery";
     game.images.forEach(function (src, i) {
@@ -533,6 +592,299 @@
     });
     modalBody.appendChild(gallery);
   }
+
+  /* ---------- PROJECT DETAIL (opened via ?game=id) ---------- */
+  const detailOverlay = document.getElementById("detailOverlay");
+  const detailTitle = document.getElementById("detailTitle");
+  const detailBody = document.getElementById("detailBody");
+  const detailClose = document.getElementById("detailClose");
+  let detailGame = null;
+  let detailLastFocused = null;
+  // Whether the open state came from a click (so there's a history entry to go
+  // back to) or from a cold load on ?game=, where back would leave the site.
+  let detailPushed = false;
+
+  function gameById(id) {
+    return GAMES.find(function (g) { return g.id === id; }) || null;
+  }
+
+  // Keep every other param intact -- a detail opened from a ?games= curated
+  // link has to stay inside that curated view when it closes.
+  function detailUrlFor(id) {
+    const params = new URLSearchParams(window.location.search);
+    if (id) params.set("game", id);
+    else params.delete("game");
+    const qs = params.toString();
+    return window.location.origin + window.location.pathname + (qs ? "?" + qs : "");
+  }
+
+  function detailSection(title, node) {
+    const section = document.createElement("div");
+    section.className = "detail-section";
+    const heading = document.createElement("div");
+    heading.className = "detail-section-title";
+    heading.textContent = title;
+    section.appendChild(heading);
+    section.appendChild(node);
+    return section;
+  }
+
+  // Copy the bare URL and nothing else. The native share sheet was pasting the
+  // title and tagline along with the link, which isn't what you want when you
+  // drop a project link into a chat.
+  function shareGame(game, btn) {
+    const url = detailUrlFor(game.id);
+    track("share/" + game.id, "Share: " + game.title, true);
+    const label = btn.textContent;
+    copyText(url, function () {
+      btn.textContent = "Link copied ✓";
+      setTimeout(function () { btn.textContent = label; }, 1800);
+    });
+  }
+
+  function buildDetailActions(game) {
+    const wrap = document.createElement("div");
+    wrap.className = "detail-actions";
+    let hasAny = false;
+
+    const primaryClass = function () { return hasAny ? "" : "is-primary"; };
+
+    if (game.status === "live" && game.embedUrl) {
+      const btn = document.createElement("button");
+      btn.type = "button";
+      btn.className = primaryClass();
+      btn.textContent = "Play here ▸";
+      btn.addEventListener("click", function () {
+        track("play/" + game.id, "Play: " + game.title, true);
+        openEmbedModal(game);
+      });
+      wrap.appendChild(btn);
+      hasAny = true;
+    }
+    if (game.status === "live" && game.playUrl) {
+      const a = document.createElement("a");
+      a.className = primaryClass();
+      a.href = game.playUrl;
+      a.target = "_blank";
+      a.rel = "noopener";
+      a.textContent = "Open ↗";
+      a.addEventListener("click", function () {
+        track("open/" + game.id, "Open: " + game.title, true);
+      });
+      wrap.appendChild(a);
+      hasAny = true;
+    }
+    // Unlike the old card row, the detail view shows every preview a game has
+    // rather than only falling back to one -- there's room for all of them.
+    if (game.youtubeId) {
+      const btn = document.createElement("button");
+      btn.type = "button";
+      btn.className = primaryClass();
+      btn.textContent = "Watch preview ▸";
+      btn.addEventListener("click", function () {
+        track("preview/" + game.id, "Preview: " + game.title, true);
+        openVideoModal(game);
+      });
+      wrap.appendChild(btn);
+      hasAny = true;
+    }
+    if (game.images && game.images.length) {
+      const btn = document.createElement("button");
+      btn.type = "button";
+      btn.className = primaryClass();
+      btn.textContent = "View photos ▸";
+      btn.addEventListener("click", function () {
+        track("photos/" + game.id, "Photos: " + game.title, true);
+        openGalleryModal(game);
+      });
+      wrap.appendChild(btn);
+      hasAny = true;
+    }
+    if (!hasAny) {
+      const span = document.createElement("span");
+      span.className = "muted";
+      span.textContent = game.status === "live" ? "Link coming soon" : "Preview coming soon";
+      wrap.appendChild(span);
+    }
+
+    const share = document.createElement("button");
+    share.type = "button";
+    share.className = "is-share";
+    share.textContent = "Share ↗";
+    share.addEventListener("click", function () { shareGame(game, share); });
+    wrap.appendChild(share);
+
+    return wrap;
+  }
+
+  function renderDetail(game) {
+    detailBody.innerHTML = "";
+    detailTitle.textContent = game.id + "." + fileExtFor(game);
+
+    if (game.image) {
+      const hero = document.createElement("div");
+      hero.className = "detail-hero" +
+        (game.orientation === "portrait" ? " detail-hero--portrait" : "");
+      const img = document.createElement("img");
+      img.src = game.image;
+      img.alt = game.title;
+      img.decoding = "async";
+      hero.appendChild(img);
+      detailBody.appendChild(hero);
+    }
+
+    const content = document.createElement("div");
+    content.className = "detail-content";
+
+    const h2 = document.createElement("h2");
+    h2.id = "detailHeading";
+    h2.textContent = game.title;
+    content.appendChild(h2);
+
+    if (game.tagline) {
+      const tagline = document.createElement("p");
+      tagline.className = "detail-tagline";
+      tagline.textContent = game.tagline;
+      content.appendChild(tagline);
+    }
+
+    const pairs = [
+      ["Status", game.status === "live" ? "Live" : "Prototype"],
+      ["Year", game.year],
+      ["Client", game.client],
+      ["Role", game.role],
+      ["Timeline", game.timeline],
+      ["Team", game.team]
+    ].filter(function (pair) { return pair[1]; });
+    if (pairs.length) {
+      const meta = document.createElement("div");
+      meta.className = "detail-meta";
+      pairs.forEach(function (pair) {
+        const item = document.createElement("div");
+        item.className = "detail-meta-item";
+        const label = document.createElement("span");
+        label.className = "detail-meta-label";
+        label.textContent = pair[0];
+        const value = document.createElement("span");
+        value.className = "detail-meta-value";
+        value.textContent = pair[1];
+        item.appendChild(label);
+        item.appendChild(value);
+        meta.appendChild(item);
+      });
+      content.appendChild(meta);
+    }
+
+    const desc = document.createElement("p");
+    desc.className = "detail-desc";
+    desc.textContent = game.description;
+    content.appendChild(detailSection("About", desc));
+
+    if (game.highlights && game.highlights.length) {
+      const list = document.createElement("ul");
+      list.className = "detail-highlights";
+      game.highlights.forEach(function (h) {
+        const li = document.createElement("li");
+        li.textContent = h;
+        list.appendChild(li);
+      });
+      content.appendChild(detailSection("Highlights", list));
+    }
+
+    if (game.challenges && game.challenges.length) {
+      const wrap = document.createElement("div");
+      game.challenges.forEach(function (c) {
+        const block = document.createElement("div");
+        block.className = "detail-challenge";
+        const title = document.createElement("div");
+        title.className = "detail-challenge-title";
+        title.textContent = c.title;
+        const body = document.createElement("div");
+        body.className = "detail-challenge-body";
+        body.textContent = c.body;
+        block.appendChild(title);
+        block.appendChild(body);
+        wrap.appendChild(block);
+      });
+      content.appendChild(detailSection("Challenges", wrap));
+    }
+
+    const tags = document.createElement("div");
+    tags.className = "tags";
+    game.tags.forEach(function (t) {
+      const span = document.createElement("span");
+      span.className = "tag";
+      span.textContent = t;
+      tags.appendChild(span);
+    });
+    content.appendChild(detailSection("Built with", tags));
+
+    content.appendChild(buildDetailActions(game));
+    detailBody.appendChild(content);
+  }
+
+  function openDetail(game, opts) {
+    const fromHistory = !!(opts && opts.fromHistory);
+    detailGame = game;
+    detailLastFocused = document.activeElement;
+    renderDetail(game);
+    detailOverlay.classList.add("open");
+    detailBody.scrollTop = 0;
+    detailClose.focus();
+    document.addEventListener("keydown", onDetailKeydown);
+    if (!fromHistory) {
+      history.pushState({ game: game.id }, "", detailUrlFor(game.id));
+      detailPushed = true;
+    }
+    track("game/" + game.id, game.title + " — project detail");
+  }
+
+  function closeDetail(opts) {
+    if (!detailOverlay.classList.contains("open")) return;
+    const pushed = detailPushed;
+    detailPushed = false;
+    detailOverlay.classList.remove("open");
+    detailBody.innerHTML = "";
+    detailGame = null;
+    document.removeEventListener("keydown", onDetailKeydown);
+    if (detailLastFocused && document.contains(detailLastFocused)) detailLastFocused.focus();
+    if (opts && opts.fromHistory) return;
+    // Going back keeps the history stack honest. On a cold load of ?game= there
+    // is nothing behind us, so just rewrite the URL in place instead.
+    if (pushed) history.back();
+    else history.replaceState({}, "", detailUrlFor(null));
+  }
+
+  function onDetailKeydown(e) {
+    if (e.key !== "Escape") return;
+    // The play/video modal stacks on top of this one; let it take Escape first.
+    if (overlay.classList.contains("open")) return;
+    closeDetail();
+  }
+
+  detailClose.addEventListener("click", function () { closeDetail(); });
+  detailOverlay.addEventListener("click", function (e) {
+    if (e.target === detailOverlay) closeDetail();
+  });
+
+  window.addEventListener("popstate", function () {
+    const id = new URLSearchParams(window.location.search).get("game");
+    const game = id ? gameById(id) : null;
+    if (game) {
+      if (detailGame && detailGame.id === game.id) return;
+      openDetail(game, { fromHistory: true });
+    } else {
+      closeDetail({ fromHistory: true });
+    }
+  });
+
+  // Cold load straight onto a shared ?game= link.
+  (function () {
+    const id = new URLSearchParams(window.location.search).get("game");
+    if (!id) return;
+    const game = gameById(id);
+    if (game) openDetail(game, { fromHistory: true });
+  })();
 
   /* ---------- SHAREABLE GAME-LINK PICKER ---------- */
   const pickerOverlay = document.getElementById("pickerOverlay");

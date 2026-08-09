@@ -366,19 +366,122 @@ footer{border-top:1px solid var(--border);background:var(--bg-panel);}
 }
 .modal-overlay.open{display:flex;}
 .modal{
+  /* Usable height for the embed = the modal cap minus the title bar. Both are
+     variables because the iframe sizing below has to do arithmetic on them. */
+  --modal-max-h:min(88vh, calc(100vh - 3rem));
+  --modal-chrome:45px;
+  --embed-h:calc(var(--modal-max-h) - var(--modal-chrome));
   background:var(--bg-panel);border:1px solid var(--border-strong);border-radius:6px;
-  width:100%;max-width:900px;max-height:88vh;display:flex;flex-direction:column;overflow:hidden;
+  width:100%;max-width:min(1180px, 95vw);max-height:var(--modal-max-h);
+  display:flex;flex-direction:column;overflow:hidden;
 }
-.modal-bar{display:flex;align-items:center;justify-content:space-between;padding:0.6rem 0.9rem;border-bottom:1px solid var(--border);background:var(--bg-panel-2);}
+.modal-bar{display:flex;align-items:center;gap:0.5rem;justify-content:space-between;padding:0.6rem 0.9rem;border-bottom:1px solid var(--border);background:var(--bg-panel-2);}
 .modal-bar span{font-size:0.76rem;color:var(--ink-muted);}
-.modal-close{background:none;border:1px solid var(--border);border-radius:3px;width:28px;height:28px;color:var(--ink);cursor:pointer;}
-.modal-close:hover{border-color:var(--accent);color:var(--accent);}
-.modal-body{padding:0;overflow:auto;background:#000;display:flex;align-items:center;justify-content:center;}
-.modal-body iframe{width:100%;border:0;display:block;}
-.modal-body.orient-landscape iframe{aspect-ratio:16/9;height:auto;}
-.modal-body.orient-portrait iframe{aspect-ratio:9/16;height:80vh;max-height:80vh;width:auto;max-width:100%;}
+.modal-bar-actions{display:flex;align-items:center;gap:0.4rem;flex-shrink:0;}
+.modal-close, .modal-fs{background:none;border:1px solid var(--border);border-radius:3px;height:28px;min-width:28px;padding:0 0.4rem;color:var(--ink);cursor:pointer;font-size:0.8rem;line-height:1;}
+.modal-close:hover, .modal-fs:hover{border-color:var(--accent);color:var(--accent);}
+.modal-body{padding:0;overflow:hidden;background:#000;display:flex;align-items:center;justify-content:center;}
+.modal-body iframe{border:0;display:block;}
+/* Drive the width from the height budget so the derived height can never push
+   past the modal, then clamp to 100% so it can't overflow sideways either.
+   The old rules fixed one axis and let the other run, which cut games off. */
+.modal-body.orient-landscape iframe{
+  aspect-ratio:16/9;height:auto;
+  width:min(100%, calc(var(--embed-h) * 16 / 9));
+}
+.modal-body.orient-portrait iframe{
+  aspect-ratio:9/16;height:auto;
+  width:min(100%, calc(var(--embed-h) * 9 / 16));
+}
+/* Fullscreen strips the modal chrome, so let the game have the whole screen. */
+.modal-body iframe:fullscreen{width:100vw;height:100vh;aspect-ratio:auto;}
 .modal-gallery{display:flex;flex-direction:column;gap:2px;width:100%;background:var(--bg-panel);}
 .modal-gallery img{width:100%;height:auto;}
+/* Galleries scroll; embeds must not. Set as a class rather than :has() so it
+   doesn't depend on selector support. */
+.modal-body.is-scroll{overflow:auto;}
+.modal-gallery{display:flex;flex-direction:column;gap:2px;width:100%;background:var(--bg-panel);}
+.modal-gallery img{width:100%;height:auto;}
+
+/* ============ PROJECT DETAIL ============ */
+/* Below the play/video overlay (z-index 100) so "Play here" from inside the
+   detail stacks on top of it instead of vanishing behind it. */
+.detail-overlay{z-index:90;}
+.detail-modal{max-width:760px;}
+.detail-body{overflow:auto;background:var(--bg-panel);}
+
+.detail-hero{
+  position:relative;width:100%;aspect-ratio:16/9;overflow:hidden;
+  background:var(--bg-panel-2);border-bottom:1px solid var(--border);
+}
+.detail-hero img{width:100%;height:100%;object-fit:cover;display:block;}
+.detail-hero--portrait{aspect-ratio:16/9;}
+.detail-hero--portrait img{object-fit:contain;background:var(--bg-panel-2);}
+
+.detail-content{padding:1.4rem 1.5rem 1.6rem;}
+.detail-content h2{
+  font-family:var(--font-display);font-size:clamp(1.5rem,3.4vw,2rem);font-weight:700;
+  text-transform:uppercase;letter-spacing:0.01em;line-height:1.05;color:var(--ink);
+}
+.detail-tagline{font-size:0.95rem;color:var(--ink-muted);margin-top:0.3rem;}
+
+.detail-meta{
+  display:flex;flex-wrap:wrap;gap:0.5rem 1.6rem;margin-top:1.1rem;
+  padding-top:1.1rem;border-top:1px solid var(--border);
+}
+.detail-meta-item{display:flex;flex-direction:column;gap:0.15rem;}
+.detail-meta-label{
+  font-family:var(--font-mono);font-size:0.66rem;text-transform:uppercase;
+  letter-spacing:0.08em;color:var(--ink-faint);
+}
+.detail-meta-value{font-size:0.85rem;color:var(--ink);font-weight:500;}
+
+.detail-section{margin-top:1.5rem;}
+.detail-section-title{
+  font-family:var(--font-mono);font-size:0.7rem;font-weight:600;text-transform:uppercase;
+  letter-spacing:0.1em;color:var(--ink-faint);margin-bottom:0.7rem;
+}
+.detail-desc{font-size:0.95rem;line-height:1.65;color:var(--ink);}
+
+.detail-highlights{list-style:none;display:flex;flex-direction:column;gap:0.5rem;}
+.detail-highlights li{
+  position:relative;padding-left:1.1rem;font-size:0.9rem;line-height:1.55;color:var(--ink);
+}
+.detail-highlights li::before{
+  content:"▸";position:absolute;left:0;top:0;color:var(--accent);font-size:0.8rem;
+}
+
+.detail-challenge{
+  padding:0.9rem 1rem;background:var(--bg-panel-2);border:1px solid var(--border);
+  border-left:2px solid var(--accent);border-radius:4px;
+}
+.detail-challenge + .detail-challenge{margin-top:0.7rem;}
+.detail-challenge-title{font-size:0.9rem;font-weight:600;color:var(--ink);margin-bottom:0.35rem;}
+.detail-challenge-body{font-size:0.88rem;line-height:1.6;color:var(--ink-muted);}
+
+.detail-actions{
+  display:flex;flex-wrap:wrap;gap:0.6rem;margin-top:1.6rem;
+  padding-top:1.3rem;border-top:1px solid var(--border);
+}
+.detail-actions button, .detail-actions a{
+  font-family:var(--font-mono);font-size:0.78rem;font-weight:600;
+  display:inline-flex;align-items:center;gap:0.4rem;cursor:pointer;
+  padding:0.6rem 1rem;border-radius:3px;text-decoration:none;
+  border:1px solid var(--border-strong);background:var(--bg-panel);color:var(--ink);
+}
+.detail-actions .is-primary{background:var(--accent);border-color:var(--accent);color:var(--accent-ink);}
+.detail-actions button:hover, .detail-actions a:hover{border-color:var(--accent);color:var(--accent);}
+.detail-actions .is-primary:hover{color:var(--accent-ink);opacity:0.9;}
+.detail-actions .is-share{margin-left:auto;}
+.detail-actions .muted{
+  font-family:var(--font-mono);font-size:0.78rem;color:var(--ink-faint);
+  border:none;background:none;padding:0.6rem 0;cursor:default;
+}
+@media(max-width:560px){
+  .detail-content{padding:1.2rem 1.1rem 1.4rem;}
+  .detail-actions .is-share{margin-left:0;}
+  .detail-actions button, .detail-actions a{flex:1 1 auto;justify-content:center;}
+}
 
 /* ============ GAME-LINK PICKER ============ */
 .picker-modal{max-width:560px;}

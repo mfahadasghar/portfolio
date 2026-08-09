@@ -145,23 +145,12 @@
     </div>
   </section>
 
+  <!-- One phrase is the seed. main.js repeats it until a group covers the
+       viewport, then mirrors the group so the -50% scroll loops seamlessly. -->
   <div class="ticker" aria-hidden="true">
     <div class="ticker-track">
       <div class="ticker-group">
-        <span class="ticker-text">Stay Hungry Stay Foolish</span><span class="ticker-dot">◆</span>
-        <span class="ticker-text">Stay Hungry Stay Foolish</span><span class="ticker-dot">◆</span>
-        <span class="ticker-text">Stay Hungry Stay Foolish</span><span class="ticker-dot">◆</span>
-        <span class="ticker-text">Stay Hungry Stay Foolish</span><span class="ticker-dot">◆</span>
-        <span class="ticker-text">Stay Hungry Stay Foolish</span><span class="ticker-dot">◆</span>
-        <span class="ticker-text">Stay Hungry Stay Foolish</span><span class="ticker-dot">◆</span>
-      </div>
-      <div class="ticker-group">
-        <span class="ticker-text">Stay Hungry Stay Foolish</span><span class="ticker-dot">◆</span>
-        <span class="ticker-text">Stay Hungry Stay Foolish</span><span class="ticker-dot">◆</span>
-        <span class="ticker-text">Stay Hungry Stay Foolish</span><span class="ticker-dot">◆</span>
-        <span class="ticker-text">Stay Hungry Stay Foolish</span><span class="ticker-dot">◆</span>
-        <span class="ticker-text">Stay Hungry Stay Foolish</span><span class="ticker-dot">◆</span>
-        <span class="ticker-text">Stay Hungry Stay Foolish</span><span class="ticker-dot">◆</span>
+        <span class="ticker-text">Make it feel good to play</span><span class="ticker-dot">◆</span>
       </div>
     </div>
   </div>
@@ -186,11 +175,26 @@
     </div>
   </footer>
 
+  <!-- Project detail. Sits below #modalOverlay on the z axis so that pressing
+       "Play here" in here stacks the game on top of it rather than under. -->
+  <div class="modal-overlay detail-overlay" id="detailOverlay">
+    <div class="modal detail-modal" role="dialog" aria-modal="true" aria-labelledby="detailHeading">
+      <div class="modal-bar">
+        <span class="mono" id="detailTitle"></span>
+        <button class="modal-close" id="detailClose" type="button" aria-label="Close">✕</button>
+      </div>
+      <div class="detail-body" id="detailBody"></div>
+    </div>
+  </div>
+
   <div class="modal-overlay" id="modalOverlay">
     <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
       <div class="modal-bar">
         <span class="mono" id="modalTitle"></span>
-        <button class="modal-close" id="modalClose" type="button" aria-label="Close">✕</button>
+        <div class="modal-bar-actions">
+          <button class="modal-fs" id="modalFullscreen" type="button" aria-label="Play fullscreen" hidden>⛶ Fullscreen</button>
+          <button class="modal-close" id="modalClose" type="button" aria-label="Close">✕</button>
+        </div>
       </div>
       <div class="modal-body" id="modalBody"></div>
     </div>
@@ -217,6 +221,19 @@
       </div>
     </div>
   </div>
+
+  <!-- GoatCounter: cookieless event tracking for project views, plays, opens
+       and shares. Cloudflare below counts page views but has no custom-event
+       API, so the per-project button clicks come from here instead. The
+       track() calls live in main.js; dashboard is at
+       https://fahadasghar.goatcounter.com
+
+       Note: GoatCounter ignores localhost and 127.0.0.1 by design, so nothing
+       is recorded while testing on Live Server. To check it end to end, add
+       data-goatcounter-settings='{"allow_local": true}' to the tag below --
+       and take it back off before deploying, or dev traffic skews the stats. -->
+  <script data-goatcounter="https://fahadasghar.goatcounter.com/count"
+          async src="//gc.zgo.at/count.js"></script>
 
   <script src="js/data.js"></script>
   <script src="js/main.js"></script>

@@ -72,22 +72,25 @@
 
   <section id="games">
     <div class="wrap">
+      <div class="filters">
+        <button class="filter-btn active" data-filter="all">All</button>
+        <button class="filter-btn" data-filter="phaser">Phaser</button>
+        <button class="filter-btn" data-filter="unity">Unity</button>
+        <button class="filter-btn" data-filter="web3">Web3</button>
+        <button class="filter-btn" data-filter="live">Live</button>
+        <button class="filter-btn" data-filter="prototype">Prototype</button>
+      </div>
       <div class="section-head">
         <div>
           <div class="eyebrow">Projects</div>
           <h2>Selected builds</h2>
         </div>
-        <div class="filters">
-          <button class="filter-btn active" data-filter="all">All</button>
-          <button class="filter-btn" data-filter="phaser">Phaser</button>
-          <button class="filter-btn" data-filter="unity">Unity</button>
-          <button class="filter-btn" data-filter="web3">Web3</button>
-          <button class="filter-btn" data-filter="live">Live</button>
-          <button class="filter-btn" data-filter="prototype">Prototype</button>
-        </div>
       </div>
-      <p class="section-note section-note-top" id="confidentialNote"></p>
-      <div class="games-grid" id="gamesGrid"></div>
+      <p class="section-note" id="confidentialNote"></p>
+      <div class="games-fade-wrap">
+        <div class="games-grid" id="gamesGrid"></div>
+        <div class="games-fade" id="gamesFade"></div>
+      </div>
       <div class="load-more-row">
         <button class="btn btn-ghost" id="loadMoreBtn" type="button">Load more ▾</button>
       </div>

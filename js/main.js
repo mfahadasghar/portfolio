@@ -237,6 +237,7 @@
 
   const PAGE_SIZE = 9;
   const loadMoreBtn = document.getElementById("loadMoreBtn");
+  const gamesFade = document.getElementById("gamesFade");
   let currentFilter = "all";
   let visibleCount = PAGE_SIZE;
 
@@ -263,7 +264,9 @@
     filtered.slice(0, visibleCount).forEach(function (game) {
       gamesGrid.appendChild(buildCard(game));
     });
-    loadMoreBtn.style.display = filtered.length > visibleCount ? "inline-flex" : "none";
+    const hasMore = filtered.length > visibleCount;
+    loadMoreBtn.style.display = hasMore ? "inline-flex" : "none";
+    gamesFade.style.display = hasMore ? "block" : "none";
   }
   renderGames();
 

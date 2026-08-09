@@ -170,6 +170,7 @@
       img.src = game.image;
       img.alt = game.title;
       img.loading = "lazy";
+      img.decoding = "async";
       thumb.appendChild(img);
     } else {
       thumb.classList.add("thumb--placeholder");
@@ -521,10 +522,13 @@
     openModal(game.title + ": photos", null);
     const gallery = document.createElement("div");
     gallery.className = "modal-gallery";
-    game.images.forEach(function (src) {
+    game.images.forEach(function (src, i) {
       const img = document.createElement("img");
       img.src = src;
       img.alt = game.title;
+      // The first shot is what the modal opens on; the rest wait for a scroll.
+      if (i > 0) img.loading = "lazy";
+      img.decoding = "async";
       gallery.appendChild(img);
     });
     modalBody.appendChild(gallery);
@@ -555,6 +559,7 @@
       thumb.src = game.image;
       thumb.alt = "";
       thumb.loading = "lazy";
+      thumb.decoding = "async";
     } else {
       thumb = document.createElement("span");
     }

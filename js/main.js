@@ -228,9 +228,20 @@
   let currentFilter = "all";
   let visibleCount = PAGE_SIZE;
 
+  const TECH_FILTERS = {
+    phaser: /phaser|html5/i,
+    unity: /unity/i,
+    web3: /web3/i
+  };
+
   function filteredGames() {
     return GAMES.filter(function (g) {
-      return currentFilter === "all" || g.status === currentFilter;
+      if (currentFilter === "all") return true;
+      if (TECH_FILTERS[currentFilter]) {
+        const re = TECH_FILTERS[currentFilter];
+        return g.tags.some(function (t) { return re.test(t); });
+      }
+      return g.status === currentFilter;
     });
   }
 

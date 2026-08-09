@@ -165,7 +165,7 @@ section{padding:clamp(3rem,6vw,4.5rem) 0;}
 .section-head{display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:2rem;gap:1rem;flex-wrap:wrap;}
 .section-head h2{font-size:clamp(1.7rem,3vw,2.3rem);text-transform:uppercase;margin-top:0.4rem;}
 
-.filters{display:flex;gap:0.4rem;}
+.filters{display:flex;flex-wrap:wrap;gap:0.4rem;}
 .filter-btn{font-family:var(--font-mono);font-size:0.72rem;letter-spacing:0.03em;padding:0.45rem 0.85rem;border:1px solid var(--border);border-radius:3px;background:var(--bg-panel);color:var(--ink-muted);cursor:pointer;}
 .filter-btn.active{border-color:var(--ink);color:var(--ink);background:var(--bg-panel-2);}
 .filter-btn:hover{border-color:var(--border-strong);}

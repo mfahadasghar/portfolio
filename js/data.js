@@ -135,7 +135,7 @@ const GAMES = [
     tagline: "Built from scratch, multiplayer-ready",
     description:
       "A full isometric, dice-based board game MVP built from the ground up for a client — board logic, dice mechanics, turn structure, and an architecture ready to plug in multiplayer.",
-    tags: ["Phaser", "HTML5", "Multiplayer"],
+    tags: ["Unity", "WebGL", "Multiplayer"],
     status: "live",
     orientation: "portrait",
     image: "assets/games/isometric-dice-board-game.jpg",

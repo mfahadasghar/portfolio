@@ -3,7 +3,7 @@
    ------------------------------------------------------------
    Everything on the site is generated from this file. To add a
    new game or course, copy an existing block below, edit it,
-   and save — no other file needs to change.
+   and save. No other file needs to change.
 
    GAME FIELDS
    ------------------------------------------------------------
@@ -14,7 +14,7 @@
    tags          array of strings, tools/skills used      (required)
    status        "live" | "prototype"                    (required)
                    "live"      -> has a real play link (store/site)
-                   "prototype" -> no live link — shows a video/photo
+                   "prototype" -> no live link, shows a video/photo
                                    preview instead
    orientation   "landscape" | "portrait"                 (required)
                    controls the thumbnail/embed shape
@@ -25,11 +25,11 @@
                    when a site is playable but can't be embedded
    embedUrl      URL that can load inside an <iframe>      (optional)
                    if set, adds an inline "Play here" option
-                   (must allow embedding — itch.io, your own host, etc.
+                   (must allow embedding: itch.io, your own host, etc.
                    won't work for sites that send X-Frame-Options: DENY)
    youtubeId     YouTube video ID for a preview            (optional)
                    e.g. "dQw4w9WgXcQ" from youtube.com/watch?v=dQw4w9WgXcQ
-                   shown as "Watch preview" — works for both live and
+                   shown as "Watch preview", works for both live and
                    prototype cards when there's no play link yet
    images        array of screenshot paths                 (optional)
                    shown in a simple gallery modal, handy for
@@ -42,16 +42,18 @@ const PROFILE = {
   name: "Fahad Asghar",
   role: "HTML5 & Phaser Game Developer",
   tagline:
-    "I build games that run in the browser — Phaser and HTML5 first, Unity when a project needs a native build. Web3 and AI aren't separate specialties, they're features I wire into the games themselves when a client needs them.",
+    "I build games that run in the browser. Phaser and HTML5 first, Unity when a project needs a native build. Web3 and AI aren't separate specialties, they're features I wire into the games themselves when a client needs them.",
   bio:
-    "I build web games — Phaser, HTML5, JavaScript, Unity, whatever the project needs to get from idea to something people can actually play. I've spent the last several years shipping games for clients, taking rough concepts and turning them into polished, playable builds without dragging out the timeline. I care about the part most people skip: making it feel good to play, not just technically working. If you've got a game idea sitting in your head and no one to build it, that's where I come in.",
+    "I build web games. Phaser, HTML5, JavaScript, Unity, whatever the project needs to get from idea to something people can actually play. I've spent the last several years shipping games for clients, taking rough concepts and turning them into polished, playable builds without dragging out the timeline. I care about the part most people skip: making it feel good to play, not just technically working. If you've got a game idea sitting in your head and no one to build it, that's where I come in.",
   location: "Sahiwal, Punjab, Pakistan",
   email: "fahadasghar360@gmail.com",
-  avatar: "", // path to a photo, e.g. "assets/profile/me.jpg" — leave blank for initials mark
+  confidentialNote: "Some of my client work is protected under NDA and isn't shown here.",
+  avatar: "assets/profile/fahad.jpg", // path to a photo: leave blank for initials mark
   stats: [
     { label: "Games shipped", value: "100+" },
-    { label: "Years building", value: "8+" },
-    { label: "Job success", value: "100%" }
+    { label: "Years building", value: "7+" },
+    { label: "Hackathons won", value: "3+" },
+    { label: "Job success", value: "100%" },
   ],
   skills: [
     "Phaser",
@@ -83,7 +85,7 @@ const GAMES = [
     title: "Four in a Row",
     tagline: "Real-time multiplayer Connect Four",
     description:
-      "A real-time multiplayer take on Connect Four — drop pieces, race your opponent to four in a row, with live player avatars and turn timers.",
+      "A real-time multiplayer take on Connect Four. Drop pieces, race your opponent to four in a row, with live player avatars and turn timers.",
     tags: ["Phaser", "Multiplayer", "Real-time"],
     status: "live",
     orientation: "landscape",
@@ -100,7 +102,7 @@ const GAMES = [
     title: "Black Peter",
     tagline: "Real-time multiplayer card game",
     description:
-      "A real-time multiplayer take on the classic Black Peter (Old Maid) card game — pull cards from opponents' hands, make pairs, and avoid being left holding the odd one out.",
+      "A real-time multiplayer take on the classic Black Peter (Old Maid) card game. Pull cards from opponents' hands, make pairs, and avoid being left holding the odd one out.",
     tags: ["Phaser", "Multiplayer", "Real-time"],
     status: "live",
     orientation: "landscape",
@@ -117,7 +119,7 @@ const GAMES = [
     title: "Super Mission",
     tagline: "2D platformer, Unity WebGL",
     description:
-      "A 2D platformer built in Unity — jump, dodge hazards and collect items across handcrafted levels, playable straight in the browser via Unity WebGL.",
+      "A 2D platformer built in Unity. Jump, dodge hazards and collect items across handcrafted levels, playable straight in the browser via Unity WebGL.",
     tags: ["Unity", "WebGL", "Platformer"],
     status: "live",
     orientation: "landscape",
@@ -131,10 +133,10 @@ const GAMES = [
   },
   {
     id: "isometric-dice-board-game",
-    title: "Isometric Dice Board Game — MVP",
+    title: "Isometric Dice Board Game: MVP",
     tagline: "Built from scratch, multiplayer-ready",
     description:
-      "A full isometric, dice-based board game MVP built from the ground up for a client — board logic, dice mechanics, turn structure, and an architecture ready to plug in multiplayer.",
+      "A full isometric, dice-based board game MVP built from the ground up for a client. Board logic, dice mechanics, turn structure, and an architecture ready to plug in multiplayer.",
     tags: ["Unity", "WebGL", "Multiplayer"],
     status: "live",
     orientation: "portrait",
@@ -151,7 +153,7 @@ const GAMES = [
     title: "Typing Game",
     tagline: "Fantasy-themed typing practice",
     description:
-      "A typing practice game with a fantasy RPG skin — type the falling words correctly before time runs out, with an on-screen keyboard that highlights the next key.",
+      "A typing practice game with a fantasy RPG skin. Type the falling words correctly before time runs out, with an on-screen keyboard that highlights the next key.",
     tags: ["HTML5", "JavaScript", "Typing"],
     status: "live",
     orientation: "landscape",
@@ -168,7 +170,7 @@ const GAMES = [
     title: "Collect the Shapes",
     tagline: "Holiday-themed shape sorting puzzle",
     description:
-      "A shape-sorting puzzle with a cozy holiday theme — drag falling shapes into the matching columns before you run out of lives.",
+      "A shape-sorting puzzle with a cozy holiday theme. Drag falling shapes into the matching columns before you run out of lives.",
     tags: ["HTML5", "JavaScript", "Puzzle"],
     status: "live",
     orientation: "landscape",
@@ -185,7 +187,7 @@ const GAMES = [
     title: "Beam",
     tagline: "Minimalist falling-block catcher",
     description:
-      "A minimalist arcade game — catch falling data blocks inside a glowing capsule-shaped frame to build combos and rack up gigabytes.",
+      "A minimalist arcade game. Catch falling data blocks inside a glowing capsule-shaped frame to build combos and rack up gigabytes.",
     tags: ["HTML5", "JavaScript", "Arcade"],
     status: "live",
     orientation: "portrait",
@@ -202,7 +204,7 @@ const GAMES = [
     title: "Glitch Run",
     tagline: "Minimalist platformer",
     description:
-      "A minimalist platformer — guide a glitchy little creature across floating platforms to reach the door before the timer runs out.",
+      "A minimalist platformer. Guide a glitchy little creature across floating platforms to reach the door before the timer runs out.",
     tags: ["HTML5", "JavaScript", "Platformer"],
     status: "live",
     orientation: "landscape",
@@ -219,7 +221,7 @@ const GAMES = [
     title: "Christmas Ninja",
     tagline: "Fruit Ninja-style holiday slicer",
     description:
-      "A holiday spin on the fruit-slicer formula — slice flying mittens, trees and gingerbread men while avoiding the ones you shouldn't cut.",
+      "A holiday spin on the fruit-slicer formula. Slice flying mittens, trees and gingerbread men while avoiding the ones you shouldn't cut.",
     tags: ["HTML5", "JavaScript", "Arcade"],
     status: "live",
     orientation: "landscape",
@@ -236,7 +238,7 @@ const GAMES = [
     title: "Sliding Puzzle",
     tagline: "Classic image sliding puzzle",
     description:
-      "A classic sliding-tile puzzle — rearrange the scrambled photo back into place, with a preview and built-in hint system.",
+      "A classic sliding-tile puzzle. Rearrange the scrambled photo back into place, with a preview and built-in hint system.",
     tags: ["HTML5", "JavaScript", "Puzzle"],
     status: "live",
     orientation: "landscape",
@@ -253,7 +255,7 @@ const GAMES = [
     title: "Memory Match",
     tagline: "Classic card-matching game",
     description:
-      "A classic memory-matching game — flip cards to find pairs before the timer runs out, built with a swappable card-image theme.",
+      "A classic memory-matching game. Flip cards to find pairs before the timer runs out, built with a swappable card-image theme.",
     tags: ["HTML5", "JavaScript", "Puzzle"],
     status: "live",
     orientation: "landscape",
@@ -270,7 +272,7 @@ const GAMES = [
     title: "Fruit Ninja",
     tagline: "Fruit-slicer with a Japanese theme",
     description:
-      "A fruit-slicer clone with a Japanese art style — slice origami cranes and rice cakes while dodging bombs against a Mount Fuji backdrop.",
+      "A fruit-slicer clone with a Japanese art style. Slice origami cranes and rice cakes while dodging bombs against a Mount Fuji backdrop.",
     tags: ["HTML5", "JavaScript", "Arcade"],
     status: "live",
     orientation: "landscape",
@@ -287,7 +289,7 @@ const GAMES = [
     title: "Lolipop Saga",
     tagline: "Match-3 candy puzzle game",
     description:
-      "A match-3 puzzle game with unlimited move possibilities — levels get genuinely challenging as they layer on multiple objectives.",
+      "A match-3 puzzle game with unlimited move possibilities. Levels get genuinely challenging as they layer on multiple objectives.",
     tags: ["Unity", "Mobile", "Match-3"],
     status: "live",
     orientation: "landscape",
@@ -338,7 +340,7 @@ const GAMES = [
     title: "Squid Arcade",
     tagline: "Casual multiplayer mini-game arena",
     description:
-      "Fun, casual multiplayer gaming — win games before time runs out or be eliminated, earn WON to customize character skins in the shop, and chat with opponents in-game. No longer listed on the Play Store.",
+      "Fun, casual multiplayer gaming. Win games before time runs out or be eliminated, earn WON to customize character skins in the shop, and chat with opponents in-game. No longer listed on the Play Store.",
     tags: ["Multiplayer", "Mobile", "Google Play"],
     status: "prototype",
     orientation: "portrait",
@@ -372,7 +374,7 @@ const GAMES = [
     title: "Meme Royale",
     tagline: "Play-to-earn tokenomic crypto project",
     description:
-      "A play-to-earn game built around $ROYALE, a deflationary token designed to grow scarcer over time through auto-burn — holders earn more ROYALE automatically just by holding.",
+      "A play-to-earn game built around $ROYALE, a deflationary token designed to grow scarcer over time through auto-burn. Holders earn more ROYALE automatically just by holding.",
     tags: ["Unity", "Web3", "Tokenomics"],
     status: "prototype",
     orientation: "landscape",
@@ -389,7 +391,7 @@ const GAMES = [
     title: "Football Tactics",
     tagline: "Multiplayer turn-based tactical sports",
     description:
-      "FBT mixes turn-based strategy (think Fire Emblem) with online competitive sports (think FIFA). Players face off on the football field, place their players, and set orders for the next turn — orders resolve simultaneously and play out for both sides.",
+      "FBT mixes turn-based strategy (think Fire Emblem) with online competitive sports (think FIFA). Players face off on the football field, place their players, and set orders for the next turn. Orders resolve simultaneously and play out for both sides.",
     tags: ["Unity", "Multiplayer", "Turn-Based Strategy"],
     status: "prototype",
     orientation: "landscape",
@@ -423,7 +425,7 @@ const GAMES = [
     title: "Simba Dash",
     tagline: "Fast-paced endless runner",
     description:
-      "An easy-to-play, fast-paced endless runner — start in the heart of the savannah and run endlessly through hurdles and dangers, with intuitive controls for casual and hardcore players alike.",
+      "An easy-to-play, fast-paced endless runner. Start in the heart of the savannah and run endlessly through hurdles and dangers, with intuitive controls for casual and hardcore players alike.",
     tags: ["Mobile", "Endless Runner"],
     status: "prototype",
     orientation: "landscape",
@@ -440,7 +442,7 @@ const GAMES = [
     title: "Ring Fighters",
     tagline: "1v1 hand-to-hand multiplayer showdown",
     description:
-      "A heart-pounding 1v1 multiplayer fighting game — street brawlers, martial artists and boxers each bring their own style. Master timing, precision and evasion, chain punches, kicks and special moves to send opponents to the canvas.",
+      "A heart-pounding 1v1 multiplayer fighting game. Street brawlers, martial artists and boxers each bring their own style. Master timing, precision and evasion, chain punches, kicks and special moves to send opponents to the canvas.",
     tags: ["Multiplayer", "Fighting", "Programming"],
     status: "prototype",
     orientation: "landscape",
@@ -457,7 +459,7 @@ const GAMES = [
     title: "Pet vs. Pets",
     tagline: "Multiplayer P2E pet-fighting arena",
     description:
-      "A multiplayer play-to-earn pet-fighting game — pick from a roster of cute Pets, pay an entrance fee to join the arena, and the last one standing takes the pool prize. Training and Gems modes let players compete without real money. New Pets are bought as NFTs from the in-game shop.",
+      "A multiplayer play-to-earn pet-fighting game. Pick from a roster of cute Pets, pay an entrance fee to join the arena, and the last one standing takes the pool prize. Training and Gems modes let players compete without real money. New Pets are bought as NFTs from the in-game shop.",
     tags: ["Unity", "Web3 / NFTs", "Multiplayer"],
     status: "prototype",
     orientation: "landscape",
@@ -474,7 +476,7 @@ const GAMES = [
     title: "SnakeCoins",
     tagline: "Multiplayer .io-style snake game",
     description:
-      "A multiplayer snake game — control an avatar that consumes multi-colored pellets, both from other players and ones that spawn naturally on the map, to grow in size.",
+      "A multiplayer snake game. Control an avatar that consumes multi-colored pellets, both from other players and ones that spawn naturally on the map, to grow in size.",
     tags: [".io Style", "Multiplayer", "Browser"],
     status: "prototype",
     orientation: "landscape",
@@ -491,7 +493,7 @@ const GAMES = [
     title: "RPS Multiplayer",
     tagline: "Rock Paper Scissors showdown",
     description:
-      "A multiplayer Rock Paper Scissors game that mixes strategy, psychology and lightning-fast decision-making — battle friends and players worldwide to climb the ranks and become RPS champion.",
+      "A multiplayer Rock Paper Scissors game that mixes strategy, psychology and lightning-fast decision-making. Battle friends and players worldwide to climb the ranks and become RPS champion.",
     tags: ["Unity", "Multiplayer"],
     status: "prototype",
     orientation: "landscape",
@@ -508,7 +510,7 @@ const GAMES = [
     title: "Pong Masterball",
     tagline: "Multiplayer ping pong showdown",
     description:
-      "A fast-paced multiplayer ping pong game — quick rallies, lightning reflexes, and opponents from all over the world in a virtual table tennis showdown.",
+      "A fast-paced multiplayer ping pong game. Quick rallies, lightning reflexes, and opponents from all over the world in a virtual table tennis showdown.",
     tags: ["Unity", "Multiplayer", "Sports"],
     status: "prototype",
     orientation: "landscape",
@@ -525,7 +527,7 @@ const GAMES = [
     title: "Cube Rivals",
     tagline: "Multiplayer rocket-tag arena",
     description:
-      "A multiplayer arena game where players score points by hitting each other with rockets — built with Photon PUN for networking, with a simple, easy-to-read UI.",
+      "A multiplayer arena game where players score points by hitting each other with rockets. Built with Photon PUN for networking, with a simple, easy-to-read UI.",
     tags: ["Unity", "Multiplayer", "Photon"],
     status: "prototype",
     orientation: "landscape",
@@ -541,7 +543,7 @@ const GAMES = [
     id: "book-of-egyptian-adventures",
     title: "Book of Egyptian Adventures",
     tagline: "Egyptian-themed slot game",
-    description: "Push the button and try your luck — an Egyptian-adventure-themed slot machine.",
+    description: "Push the button and try your luck. An Egyptian-adventure-themed slot machine.",
     tags: ["Unity", "Slots / Casino"],
     status: "prototype",
     orientation: "landscape",
@@ -558,7 +560,7 @@ const GAMES = [
     title: "Burning Coinman",
     tagline: "2D crypto coin-collector",
     description:
-      "An exhilarating 2D mobile game where collecting crypto coins comes with a twist — collected coins are burned, reducing token supply and driving up value. Play as Coinman, gathering as many coins as possible before they turn to ash.",
+      "An exhilarating 2D mobile game where collecting crypto coins comes with a twist. Collected coins are burned, reducing token supply and driving up value. Play as Coinman, gathering as many coins as possible before they turn to ash.",
     tags: ["Unity", "Mobile", "Web3"],
     status: "prototype",
     orientation: "landscape",
@@ -572,11 +574,58 @@ const GAMES = [
   }
 ];
 
+/* TESTIMONIAL FIELDS
+   quote      the review, verbatim, plain text          (required)
+   project    the job/project title                      (optional)
+   location   client's country/city, if shown             (optional)
+   clientNote a standout client stat, e.g. big spend      (optional)
+   rating     out of 5                                    (optional) */
+const TESTIMONIALS = [
+  {
+    quote:
+      "Fahad is knows what he is doing. He didnt have any problems with additional requests in terms of security implementation and I have already rehired him ;)",
+    project: "Mini Game Development in Phaser or PixiJS",
+    location: "Bratislava, Slovakia",
+    clientNote: "",
+    rating: 5.0
+  },
+  {
+    quote: "Fahad is a very talented developer. Really appreciate your help, Fahad!",
+    project: "Unity Dev Coach",
+    location: "Boise, United States",
+    clientNote: "",
+    rating: 5.0
+  },
+  {
+    quote:
+      "It was a pleasure working with Fahad. He quickly understood the brief and handled every challenge we presented with ease. His strong grasp of key concepts made even complex tasks straightforward for him. I would gladly work with him again.",
+    project: "HTML5 Game Developer, Phaser Integration",
+    location: "Chesterfield, United Kingdom",
+    clientNote: "",
+    rating: 5.0
+  },
+  {
+    quote: "Fahad is an expert in his field and I can highly recommend him!",
+    project: "Fruit Ninja Clone in Phaser",
+    location: "",
+    clientNote: "",
+    rating: 5.0
+  },
+  {
+    quote:
+      "Fahad completed the task successfully and showed great communication skills. We will make sure to come back to him for similar future tasks.",
+    project: "Scratch Mechanics Script",
+    location: "",
+    clientNote: "",
+    rating: 5.0
+  }
+];
+
 /* COURSE FIELDS
    title, provider, date ("Jul 2026"), url (credential link, optional) */
 const COURSES = [
   {
-    title: "The Psychology of Games — Secrets of Good Game Design",
+    title: "The Psychology of Games: Secrets of Good Game Design",
     provider: "Udemy",
     date: "Jul 2026",
     url: "https://www.udemy.com/certificate/UC-e00e6597-7ba5-4cd2-a086-ca3edc62d30f/"
@@ -606,7 +655,7 @@ const COURSES = [
     url: "https://www.udemy.com/certificate/UC-06934b6d-475c-4ae7-aab9-042ac069261a/"
   },
   {
-    title: "Unity Game Development — Build a Basketball Game",
+    title: "Unity Game Development: Build a Basketball Game",
     provider: "Udemy",
     date: "Jan 2019",
     url: "https://www.udemy.com/certificate/UC-Y95PPXVF/"

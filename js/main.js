@@ -46,6 +46,11 @@
   });
 
   /* ---------- ABOUT ---------- */
+  if (PROFILE.avatar) {
+    const aboutPhoto = document.getElementById("aboutPhoto");
+    aboutPhoto.src = PROFILE.avatar;
+    aboutPhoto.hidden = false;
+  }
   document.getElementById("aboutBio").textContent = PROFILE.bio;
   const skillsList = document.getElementById("skillsList");
   PROFILE.skills.forEach(function (skill) {
@@ -65,7 +70,7 @@
   });
 
   /* ---------- FOOTER ---------- */
-  document.getElementById("footerLocation").textContent = "© 2026 " + PROFILE.name + " — " + PROFILE.location;
+  document.getElementById("footerLocation").textContent = "© 2026 " + PROFILE.name + ", " + PROFILE.location;
   const linkRow = document.getElementById("linkRow");
   PROFILE.links.forEach(function (link) {
     const a = document.createElement("a");
@@ -77,6 +82,13 @@
     }
     linkRow.appendChild(a);
   });
+
+  const createLinkBtn = document.createElement("button");
+  createLinkBtn.type = "button";
+  createLinkBtn.id = "createLinkBtn";
+  createLinkBtn.className = "share-link-btn";
+  createLinkBtn.textContent = "Create a shareable game link ▸";
+  document.getElementById("footerUtilities").appendChild(createLinkBtn);
 
   /* ---------- GAME CARDS ---------- */
   const gamesGrid = document.getElementById("gamesGrid");
@@ -271,6 +283,107 @@
     });
   });
 
+  if (PROFILE.confidentialNote) {
+    document.getElementById("confidentialNote").textContent = PROFILE.confidentialNote;
+  }
+
+  /* ---------- TESTIMONIALS ---------- */
+  const SVG_NS = "http://www.w3.org/2000/svg";
+  const STAR_PATH = "M12 2.5l2.9 6.06 6.6.83-4.85 4.6 1.27 6.6L12 17.4l-5.92 3.19 1.27-6.6-4.85-4.6 6.6-.83z";
+
+  function buildStars(rating) {
+    const wrap = document.createElement("div");
+    wrap.className = "testimonial-stars";
+    const filled = Math.round(rating);
+    for (let i = 1; i <= 5; i++) {
+      const svg = document.createElementNS(SVG_NS, "svg");
+      svg.setAttribute("viewBox", "0 0 24 24");
+      svg.setAttribute("class", "star-icon" + (i <= filled ? " filled" : ""));
+      const path = document.createElementNS(SVG_NS, "path");
+      path.setAttribute("d", STAR_PATH);
+      svg.appendChild(path);
+      wrap.appendChild(svg);
+    }
+    const num = document.createElement("span");
+    num.className = "testimonial-rating-num";
+    num.textContent = rating.toFixed(1);
+    wrap.appendChild(num);
+    return wrap;
+  }
+
+  const testimonialsGrid = document.getElementById("testimonialsGrid");
+  (typeof TESTIMONIALS !== "undefined" ? TESTIMONIALS : []).forEach(function (t) {
+    const card = document.createElement("div");
+    card.className = "testimonial-card";
+
+    if (t.rating) {
+      card.appendChild(buildStars(t.rating));
+    }
+
+    const quote = document.createElement("p");
+    quote.className = "testimonial-quote";
+    quote.textContent = t.quote;
+    card.appendChild(quote);
+
+    const meta = document.createElement("div");
+    meta.className = "testimonial-meta";
+    if (t.project) {
+      const project = document.createElement("div");
+      project.className = "testimonial-project";
+      project.textContent = t.project;
+      meta.appendChild(project);
+    }
+    if (t.location) {
+      const location = document.createElement("div");
+      location.className = "testimonial-location";
+      location.textContent = t.location;
+      meta.appendChild(location);
+    }
+    if (t.clientNote) {
+      const note = document.createElement("div");
+      note.className = "testimonial-clientnote";
+      note.textContent = t.clientNote;
+      meta.appendChild(note);
+    }
+    card.appendChild(meta);
+
+    testimonialsGrid.appendChild(card);
+  });
+
+  /* ---------- CURATED SHORTLIST (opened via ?games=id1,id2) ---------- */
+  (function () {
+    const params = new URLSearchParams(window.location.search);
+    const raw = params.get("games");
+    if (!raw) return;
+    const ids = raw.split(",").map(function (s) { return s.trim(); }).filter(Boolean);
+    const picks = ids
+      .map(function (id) { return GAMES.find(function (g) { return g.id === id; }); })
+      .filter(Boolean);
+    if (!picks.length) return;
+
+    const curatedSection = document.getElementById("curated");
+    const curatedGrid = document.getElementById("curatedGrid");
+    picks.forEach(function (game) {
+      curatedGrid.appendChild(buildCard(game));
+    });
+    curatedSection.hidden = false;
+
+    // This is a stripped-down share link: show only the picks, nothing else.
+    ["top", "games", "testimonials", "courses", "about"].forEach(function (id) {
+      const el = document.getElementById(id);
+      if (el) el.hidden = true;
+    });
+    const contactFooter = document.getElementById("contact");
+    if (contactFooter) contactFooter.hidden = true;
+
+    // Any in-page nav link (header logo, nav, "see all games") should drop
+    // ?games= and do a real navigation back to the full site, not just an
+    // anchor-jump within this stripped-down page.
+    document.querySelectorAll('header.site a[href^="#"]').forEach(function (a) {
+      a.setAttribute("href", "./" + a.getAttribute("href"));
+    });
+  })();
+
   /* ---------- COURSES ---------- */
   const courseLog = document.getElementById("courseLog");
   COURSES.forEach(function (c) {
@@ -280,7 +393,7 @@
       ? '<span class="check">✓</span><a href="' + c.url + '" target="_blank" rel="noopener">' + c.title + "</a>"
       : '<span class="check">✓</span>' + c.title;
     row.innerHTML =
-      '<span class="date mono">' + (c.date || "—") + '</span>' +
+      '<span class="date mono">' + (c.date || "TBD") + '</span>' +
       '<span class="title">' + titleHtml + '</span>' +
       '<span class="provider">' + c.provider + '</span>';
     courseLog.appendChild(row);
@@ -325,7 +438,7 @@
   }
 
   function openVideoModal(game) {
-    openModal(game.title + " — preview", "landscape");
+    openModal(game.title + ": preview", "landscape");
     const iframe = document.createElement("iframe");
     iframe.src = "https://www.youtube-nocookie.com/embed/" + game.youtubeId;
     iframe.setAttribute("allow", "accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture");
@@ -334,7 +447,7 @@
   }
 
   function openGalleryModal(game) {
-    openModal(game.title + " — photos", null);
+    openModal(game.title + ": photos", null);
     const gallery = document.createElement("div");
     gallery.className = "modal-gallery";
     game.images.forEach(function (src) {
@@ -345,4 +458,123 @@
     });
     modalBody.appendChild(gallery);
   }
+
+  /* ---------- SHAREABLE GAME-LINK PICKER ---------- */
+  const pickerOverlay = document.getElementById("pickerOverlay");
+  const pickerClose = document.getElementById("pickerClose");
+  const pickerList = document.getElementById("pickerList");
+  const pickerCount = document.getElementById("pickerCount");
+  const pickerClearBtn = document.getElementById("pickerClear");
+  const pickerGenerateBtn = document.getElementById("pickerGenerate");
+  const pickerResult = document.getElementById("pickerResult");
+  const pickerLinkInput = document.getElementById("pickerLinkInput");
+  const pickerCopyBtn = document.getElementById("pickerCopyBtn");
+
+  GAMES.forEach(function (game) {
+    const label = document.createElement("label");
+    label.className = "picker-item";
+
+    const checkbox = document.createElement("input");
+    checkbox.type = "checkbox";
+    checkbox.setAttribute("data-id", game.id);
+
+    let thumb;
+    if (game.image) {
+      thumb = document.createElement("img");
+      thumb.src = game.image;
+      thumb.alt = "";
+      thumb.loading = "lazy";
+    } else {
+      thumb = document.createElement("span");
+    }
+    thumb.className = "picker-thumb-mini";
+
+    const text = document.createElement("div");
+    text.className = "picker-item-text";
+    const titleEl = document.createElement("div");
+    titleEl.className = "picker-item-title";
+    titleEl.textContent = game.title;
+    text.appendChild(titleEl);
+    if (game.tagline) {
+      const taglineEl = document.createElement("div");
+      taglineEl.className = "picker-item-tagline";
+      taglineEl.textContent = game.tagline;
+      text.appendChild(taglineEl);
+    }
+
+    label.appendChild(checkbox);
+    label.appendChild(thumb);
+    label.appendChild(text);
+    pickerList.appendChild(label);
+  });
+
+  function pickerSelectedIds() {
+    return Array.prototype.slice.call(pickerList.querySelectorAll('input[type="checkbox"]:checked'))
+      .map(function (cb) { return cb.getAttribute("data-id"); });
+  }
+
+  function updatePickerCount() {
+    const n = pickerSelectedIds().length;
+    pickerCount.textContent = n + (n === 1 ? " selected" : " selected");
+    pickerGenerateBtn.disabled = n === 0;
+    pickerResult.hidden = true;
+  }
+
+  pickerList.addEventListener("change", updatePickerCount);
+
+  pickerClearBtn.addEventListener("click", function () {
+    Array.prototype.forEach.call(pickerList.querySelectorAll('input[type="checkbox"]'), function (cb) {
+      cb.checked = false;
+    });
+    updatePickerCount();
+  });
+
+  pickerGenerateBtn.addEventListener("click", function () {
+    const ids = pickerSelectedIds();
+    if (!ids.length) return;
+    const url = window.location.origin + window.location.pathname + "?games=" + encodeURIComponent(ids.join(","));
+    pickerLinkInput.value = url;
+    pickerResult.hidden = false;
+    pickerLinkInput.focus();
+    pickerLinkInput.select();
+  });
+
+  pickerCopyBtn.addEventListener("click", function () {
+    pickerLinkInput.focus();
+    pickerLinkInput.select();
+    const restoreLabel = function () {
+      setTimeout(function () { pickerCopyBtn.textContent = "Copy link"; }, 1500);
+    };
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(pickerLinkInput.value).then(function () {
+        pickerCopyBtn.textContent = "Copied!";
+        restoreLabel();
+      }).catch(function () {
+        document.execCommand("copy");
+        pickerCopyBtn.textContent = "Copied!";
+        restoreLabel();
+      });
+    } else {
+      document.execCommand("copy");
+      pickerCopyBtn.textContent = "Copied!";
+      restoreLabel();
+    }
+  });
+
+  function openPicker() {
+    pickerOverlay.classList.add("open");
+    document.addEventListener("keydown", onPickerKeydown);
+  }
+  function closePicker() {
+    pickerOverlay.classList.remove("open");
+    document.removeEventListener("keydown", onPickerKeydown);
+  }
+  function onPickerKeydown(e) {
+    if (e.key === "Escape") closePicker();
+  }
+  createLinkBtn.addEventListener("click", openPicker);
+  pickerClose.addEventListener("click", closePicker);
+  pickerOverlay.addEventListener("click", function (e) {
+    if (e.target === pickerOverlay) closePicker();
+  });
 })();

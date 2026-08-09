@@ -117,7 +117,16 @@
         a.textContent = "Open ↗";
         wrap.appendChild(a);
       }
-      if (!game.embedUrl && !game.playUrl) {
+      if (!game.embedUrl && !game.playUrl && game.youtubeId) {
+        const btn = document.createElement("button");
+        btn.type = "button";
+        btn.textContent = "Watch preview ▸";
+        btn.addEventListener("click", function () {
+          openVideoModal(game);
+        });
+        wrap.appendChild(btn);
+      }
+      if (!game.embedUrl && !game.playUrl && !game.youtubeId) {
         const span = document.createElement("span");
         span.className = "muted";
         span.textContent = "Link coming soon";

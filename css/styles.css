@@ -125,6 +125,18 @@ nav.primary a:hover{color:var(--ink);}
 .theme-toggle{width:34px;height:34px;border:1px solid var(--border);border-radius:4px;background:var(--bg-panel-2);color:var(--ink);display:flex;align-items:center;justify-content:center;cursor:pointer;}
 .theme-toggle:hover{border-color:var(--border-strong);}
 .theme-toggle svg{width:16px;height:16px;}
+/* Hamburger: hidden until the nav collapses (see RESPONSIVE). */
+.nav-toggle{
+  display:none;width:34px;height:34px;padding:0;
+  border:1px solid var(--border);border-radius:4px;background:var(--bg-panel-2);
+  color:var(--ink);align-items:center;justify-content:center;cursor:pointer;
+}
+.nav-toggle:hover{border-color:var(--border-strong);}
+.nav-toggle-bars{display:flex;flex-direction:column;gap:3px;width:16px;}
+.nav-toggle-bars span{display:block;height:1.5px;background:currentColor;border-radius:1px;transition:transform .15s ease,opacity .15s ease;}
+header.site.nav-open .nav-toggle-bars span:nth-child(1){transform:translateY(4.5px) rotate(45deg);}
+header.site.nav-open .nav-toggle-bars span:nth-child(2){opacity:0;}
+header.site.nav-open .nav-toggle-bars span:nth-child(3){transform:translateY(-4.5px) rotate(-45deg);}
 
 /* ============ CURATED SHORTLIST ============ */
 .curated{
@@ -170,16 +182,22 @@ nav.primary a:hover{color:var(--ink);}
 .stat .label{font-family:var(--font-mono);font-size:0.68rem;color:var(--ink-faint);text-transform:uppercase;letter-spacing:0.08em;}
 
 /* ============ SECTIONS ============ */
+/* The header is sticky, so anchor jumps must stop short of it. */
+section, footer{scroll-margin-top:70px;}
 section{padding:clamp(3rem,6vw,4.5rem) 0;}
 .section-head{display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:2rem;gap:1rem;flex-wrap:wrap;}
 .section-head h2{font-size:clamp(1.7rem,3vw,2.3rem);text-transform:uppercase;margin-top:0.4rem;}
 
 .filters{display:flex;flex-wrap:wrap;justify-content:flex-end;gap:0.4rem;margin-bottom:1.5rem;}
+.section-head:has(.filters) h2{line-height:1;margin-bottom:-0.111em;}
+.section-head .filters{margin-bottom:0;}
 .filter-btn{font-family:var(--font-mono);font-size:0.72rem;letter-spacing:0.03em;padding:0.45rem 0.85rem;border:1px solid var(--border);border-radius:3px;background:var(--bg-panel);color:var(--ink-muted);cursor:pointer;}
 .filter-btn.active{border-color:var(--ink);color:var(--ink);background:var(--bg-panel-2);}
 .filter-btn:hover{border-color:var(--border-strong);}
 
-.section-note{margin-top:0.9rem;font-size:0.82rem;color:var(--ink-faint);max-width:60ch;}
+.section-head:has(.filters){margin-bottom:1.15rem;}
+.section-note{margin-top:0;font-size:0.82rem;color:var(--ink-faint);max-width:60ch;}
+.section-note + .games-fade-wrap{margin-top:1.15rem;}
 
 /* ============ GAME CARDS ============ */
 .games-grid{column-count:1;column-gap:1.4rem;}
@@ -191,11 +209,15 @@ section{padding:clamp(3rem,6vw,4.5rem) 0;}
 
 .games-fade-wrap{position:relative;margin-top:1.75rem;}
 .games-fade{
-  position:absolute;left:0;right:0;bottom:0;height:220px;
-  background:linear-gradient(to bottom, transparent, var(--bg) 75%);
+  position:absolute;left:0;right:0;bottom:0;height:460px;
+  background:linear-gradient(to bottom, transparent, var(--bg) 70%);
   pointer-events:none;
 }
-.load-more-row{position:relative;z-index:2;display:flex;justify-content:center;margin-top:-70px;}
+.load-more-row{position:relative;z-index:2;display:flex;justify-content:center;margin-top:1.5rem;}
+/* Only the games grid has a fade to tuck the button into. */
+.games-fade-wrap + .load-more-row{margin-top:-160px;}
+/* Everything loaded: no button to tuck, so keep the section off the next one. */
+.games-fade-wrap + .load-more-row.is-done{margin-top:1.5rem;}
 
 .card-bar{display:flex;align-items:center;justify-content:space-between;gap:0.5rem;padding:0.55rem 0.75rem;border-bottom:1px solid var(--border);background:var(--bg-panel-2);}
 .card-bar .fname{font-family:var(--font-mono);font-size:0.72rem;color:var(--ink-muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
@@ -281,8 +303,10 @@ section{padding:clamp(3rem,6vw,4.5rem) 0;}
 @media(max-width:760px){.about-grid{grid-template-columns:1fr;}}
 .about-grid h2{font-size:clamp(1.7rem,3vw,2.3rem);text-transform:uppercase;margin:0.4rem 0 1.1rem;}
 .about-header{display:flex;align-items:center;gap:1.1rem;}
+.about-header > div{display:flex;flex-direction:column;justify-content:center;}
+.about-header h2{margin:0.15rem 0 0;}
 .about-photo{width:76px;height:76px;border-radius:50%;object-fit:cover;border:1px solid var(--border);flex-shrink:0;}
-.about-bio{font-size:0.98rem;color:var(--ink-muted);max-width:60ch;}
+.about-bio{font-size:0.98rem;color:var(--ink-muted);max-width:60ch;margin-top:1.25rem;}
 .skills{display:flex;flex-wrap:wrap;gap:0.5rem;margin-top:0.9rem;}
 .skills span{font-family:var(--font-mono);font-size:0.78rem;padding:0.4rem 0.7rem;border:1px solid var(--border);border-radius:3px;color:var(--ink);background:var(--bg-panel);}
 
@@ -290,6 +314,23 @@ section{padding:clamp(3rem,6vw,4.5rem) 0;}
 .education .edu-item{padding-left:0.85rem;border-left:2px solid var(--border);}
 .education .edu-school{font-size:0.92rem;font-weight:600;color:var(--ink);}
 .education .edu-degree{font-family:var(--font-mono);font-size:0.76rem;color:var(--ink-muted);margin-top:0.15rem;}
+
+/* ============ TICKER ============ */
+.ticker{
+  overflow:hidden;background:var(--ink);border-top:1px solid var(--border);border-bottom:1px solid var(--border);
+  padding:1.1rem 0;
+}
+.ticker-track{display:flex;width:max-content;animation:ticker-scroll 26s linear infinite;}
+.ticker-group{display:flex;align-items:center;flex-shrink:0;}
+.ticker-text{
+  font-family:var(--font-display);font-size:clamp(1.3rem,2.6vw,1.9rem);font-weight:700;
+  text-transform:uppercase;letter-spacing:0.02em;color:var(--bg);white-space:nowrap;padding:0 1.25rem;
+}
+.ticker-dot{color:var(--accent);font-size:0.85rem;}
+@keyframes ticker-scroll{
+  from{transform:translateX(0);}
+  to{transform:translateX(-50%);}
+}
 
 /* ============ FOOTER ============ */
 footer{border-top:1px solid var(--border);background:var(--bg-panel);}
@@ -353,7 +394,68 @@ footer{border-top:1px solid var(--border);background:var(--bg-panel);}
   background:var(--bg-panel-2);color:var(--ink);
 }
 
+/* ============ RESPONSIVE ============
+   Layout is fluid by default (clamp + column-count), so these blocks only
+   handle the parts that cannot shrink on their own: the header row, the
+   stat strip's dividers, and dialogs that assume a roomy viewport. */
+
+/* The path label is the first thing worth losing when the bar gets tight. */
+.metabar .wrap{gap:0.75rem;}
+.metabar .wrap > span:first-child{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.metabar .status{flex-shrink:0;white-space:nowrap;}
+
+@media(max-width:860px){
+  /* Five nav items plus the logo cannot share one 60px row, so below this
+     width the nav collapses behind the hamburger and drops down as a panel. */
+  .nav-toggle{display:flex;}
+  nav.primary{
+    display:none;
+    position:absolute;top:100%;left:0;right:0;
+    flex-direction:column;gap:0;
+    padding:0.25rem clamp(1rem,4vw,2.5rem) 0.75rem;
+    background:var(--bg-panel);
+    border-bottom:1px solid var(--border);
+    box-shadow:0 10px 20px rgba(0,0,0,0.06);
+  }
+  header.site.nav-open nav.primary{display:flex;}
+  nav.primary a{
+    padding:0.8rem 0;font-size:0.85rem;color:var(--ink);
+    border-bottom:1px solid var(--border);
+  }
+  nav.primary a:last-child{border-bottom:none;}
+}
+
+@media(max-width:700px){
+  /* Filters sit under the heading once wrapped, so trailing them off the
+     right edge no longer lines up with anything. */
+  .filters{justify-content:flex-start;}
+  .section-head:has(.filters){margin-bottom:1rem;}
+  .games-fade{height:320px;}
+  .games-fade-wrap + .load-more-row{margin-top:-110px;}
+}
+
+@media(max-width:560px){
+  /* 4 stats in one row leaves ~90px each; 2x2 keeps the numbers readable. */
+  .stat-row{display:grid;grid-template-columns:1fr 1fr;padding-left:0;}
+  .stat{padding:0.8rem 0 0.5rem;margin-right:0;border-right:none;border-bottom:1px solid var(--border);}
+  .stat:nth-child(odd){border-right:1px solid var(--border);padding-right:1rem;}
+  .stat:nth-child(even){padding-left:1rem;}
+  .stat:nth-last-child(-n+2){border-bottom:none;}
+
+  .about-header{gap:0.85rem;}
+  .about-photo{width:60px;height:60px;}
+
+  .modal-overlay{padding:0.75rem;}
+  .modal{max-height:92vh;}
+  .modal-body.orient-portrait iframe{height:68vh;max-height:68vh;}
+  .picker-list{max-height:44vh;}
+  .picker-footer{justify-content:flex-end;}
+  .picker-result{flex-wrap:wrap;}
+  .picker-result .btn{width:100%;justify-content:center;}
+}
+
 @media (prefers-reduced-motion: reduce){
   html{scroll-behavior:auto;}
   *{transition:none !important;}
+  .ticker-track{animation:none;}
 }

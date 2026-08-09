@@ -33,6 +33,40 @@
     syncThemeIcon();
   });
 
+  /* ---------- MOBILE NAV ---------- */
+  const siteHeader = document.querySelector("header.site");
+  const navToggle = document.getElementById("navToggle");
+  const primaryNav = document.getElementById("primaryNav");
+  const wideNav = window.matchMedia("(min-width:861px)");
+
+  function setNavOpen(open) {
+    siteHeader.classList.toggle("nav-open", open);
+    navToggle.setAttribute("aria-expanded", open ? "true" : "false");
+    navToggle.setAttribute("aria-label", open ? "Close menu" : "Open menu");
+  }
+
+  navToggle.addEventListener("click", function () {
+    setNavOpen(!siteHeader.classList.contains("nav-open"));
+  });
+  primaryNav.addEventListener("click", function (e) {
+    if (e.target.closest("a")) setNavOpen(false);
+  });
+  document.addEventListener("keydown", function (e) {
+    if (e.key === "Escape" && siteHeader.classList.contains("nav-open")) {
+      setNavOpen(false);
+      navToggle.focus();
+    }
+  });
+  document.addEventListener("click", function (e) {
+    if (!siteHeader.classList.contains("nav-open")) return;
+    if (!e.target.closest("header.site")) setNavOpen(false);
+  });
+  // Growing past the breakpoint shows the nav again; drop the open state so the
+  // hamburger isn't left stuck as an X when it comes back.
+  wideNav.addEventListener("change", function (e) {
+    if (e.matches) setNavOpen(false);
+  });
+
   /* ---------- HERO ---------- */
   document.getElementById("heroLead").textContent = PROFILE.tagline;
 
@@ -79,6 +113,35 @@
     if (link.url.indexOf("http") === 0) {
       a.target = "_blank";
       a.rel = "noopener";
+    }
+    // A mailto does nothing at all on machines with no mail client registered,
+    // so also drop the address on the clipboard and say so.
+    if (link.url.indexOf("mailto:") === 0) {
+      const address = link.url.slice("mailto:".length);
+      a.title = address;
+      a.addEventListener("click", function () {
+        const label = a.textContent;
+        const done = function () {
+          a.textContent = "Copied: " + address;
+          setTimeout(function () { a.textContent = label; }, 1800);
+        };
+        const legacyCopy = function () {
+          const ta = document.createElement("textarea");
+          ta.value = address;
+          ta.setAttribute("readonly", "");
+          ta.style.cssText = "position:fixed;top:0;left:-9999px;";
+          document.body.appendChild(ta);
+          ta.select();
+          try { document.execCommand("copy"); } catch (err) { /* nothing else to try */ }
+          document.body.removeChild(ta);
+          done();
+        };
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard.writeText(address).then(done).catch(legacyCopy);
+        } else {
+          legacyCopy();
+        }
+      });
     }
     linkRow.appendChild(a);
   });
@@ -267,6 +330,9 @@
     const hasMore = filtered.length > visibleCount;
     loadMoreBtn.style.display = hasMore ? "inline-flex" : "none";
     gamesFade.style.display = hasMore ? "block" : "none";
+    // With the button gone there is nothing to tuck into the fade, so the row
+    // must stop pulling the section up over the last row of cards.
+    loadMoreBtn.parentElement.classList.toggle("is-done", !hasMore);
   }
   renderGames();
 
@@ -378,6 +444,8 @@
     });
     const contactFooter = document.getElementById("contact");
     if (contactFooter) contactFooter.hidden = true;
+    const ticker = document.querySelector(".ticker");
+    if (ticker) ticker.hidden = true;
 
     // Any in-page nav link (header logo, nav, "see all games") should drop
     // ?games= and do a real navigation back to the full site, not just an

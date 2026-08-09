@@ -54,6 +54,16 @@
     skillsList.appendChild(span);
   });
 
+  const educationList = document.getElementById("educationList");
+  (PROFILE.education || []).forEach(function (edu) {
+    const item = document.createElement("div");
+    item.className = "edu-item";
+    item.innerHTML =
+      '<div class="edu-school">' + edu.school + "</div>" +
+      '<div class="edu-degree">' + edu.degree + (edu.years ? " · " + edu.years : "") + "</div>";
+    educationList.appendChild(item);
+  });
+
   /* ---------- FOOTER ---------- */
   document.getElementById("footerLocation").textContent = "© 2026 " + PROFILE.name + " — " + PROFILE.location;
   const linkRow = document.getElementById("linkRow");
@@ -213,25 +223,40 @@
     return card;
   }
 
-  function renderGames() {
-    gamesGrid.innerHTML = "";
-    GAMES.forEach(function (game) {
-      gamesGrid.appendChild(buildCard(game));
+  const PAGE_SIZE = 9;
+  const loadMoreBtn = document.getElementById("loadMoreBtn");
+  let currentFilter = "all";
+  let visibleCount = PAGE_SIZE;
+
+  function filteredGames() {
+    return GAMES.filter(function (g) {
+      return currentFilter === "all" || g.status === currentFilter;
     });
   }
+
+  function renderGames() {
+    const filtered = filteredGames();
+    gamesGrid.innerHTML = "";
+    filtered.slice(0, visibleCount).forEach(function (game) {
+      gamesGrid.appendChild(buildCard(game));
+    });
+    loadMoreBtn.style.display = filtered.length > visibleCount ? "inline-flex" : "none";
+  }
   renderGames();
+
+  loadMoreBtn.addEventListener("click", function () {
+    visibleCount += PAGE_SIZE;
+    renderGames();
+  });
 
   const filterBtns = document.querySelectorAll(".filter-btn");
   filterBtns.forEach(function (btn) {
     btn.addEventListener("click", function () {
       filterBtns.forEach(function (b) { b.classList.remove("active"); });
       btn.classList.add("active");
-      const filter = btn.getAttribute("data-filter");
-      document.querySelectorAll("#gamesGrid .card").forEach(function (card) {
-        const show = filter === "all" || card.getAttribute("data-status") === filter;
-        if (show) card.removeAttribute("hidden");
-        else card.setAttribute("hidden", "");
-      });
+      currentFilter = btn.getAttribute("data-filter");
+      visibleCount = PAGE_SIZE;
+      renderGames();
     });
   });
 

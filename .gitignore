@@ -1,2 +1,35 @@
 docs/
+.devcontainer/
+
+# OS junk. The repo is bind-mounted from the host into the dev container, so
+# host-side files (macOS Finder, Windows Explorer) land here too.
 .DS_Store
+._*
+.Spotlight-V100
+.Trashes
+Thumbs.db
+desktop.ini
+
+# Editor / IDE local state. VS Code settings that matter are already declared
+# in .devcontainer/devcontainer.json, so a local .vscode/ is personal overrides.
+.vscode/
+.idea/
+*.swp
+
+# Claude Code. settings.json is shareable project config and can be committed;
+# these two are per-machine and should not be.
+.claude/settings.local.json
+.claude/.cc-writes/
+
+# Tooling that may run inside the container. The site itself has no build step,
+# but anything npx/npm/python writes into the working dir lands in the repo.
+node_modules/
+__pycache__/
+*.log
+npm-debug.log*
+yarn-error.log
+
+# Secrets. Nothing here needs them today (the analytics tokens in index.html are
+# public site identifiers), but this keeps a stray one from being committed.
+.env
+.env.*
